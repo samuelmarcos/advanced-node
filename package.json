@@ -4,6 +4,7 @@
   "description": "Estudo avançado sobre a linguagem Typescript",
   "main": "index.js",
   "scripts": {
+    "start": " node dist/main/api/index.js",
     "build": "rimraf dist && tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,6 +12,9 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/module-alias": "^2.0.4",
+    "@types/node": "^20.9.2",
+    "module-alias": "^2.2.3",
     "rimraf": "^5.0.5",
     "typescript": "^5.3.2"
   }
