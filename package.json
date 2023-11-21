@@ -10,7 +10,8 @@
     "lint:fix": "npm run lint -- --fix",
     "test": "jest --passWithNoTests --no-cache --runInBand",
     "test:watch": "npm t -- --watch",
-    "test:coverage": "npm t -- --coverage"
+    "test:coverage": "npm t -- --coverage",
+    "test:staged": "npm t -- --findRelatedTests"
   },
   "keywords": [],
   "author": "Samuel Marcos Neto Barbosa",
@@ -26,6 +27,7 @@
     "eslint-plugin-n": "^16.3.1",
     "eslint-plugin-promise": "^6.1.1",
     "jest": "^29.7.0",
+    "lint-staged": "^15.1.0",
     "module-alias": "^2.2.3",
     "rimraf": "^5.0.5",
     "ts-jest": "^29.1.1",
