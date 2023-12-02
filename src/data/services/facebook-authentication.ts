@@ -9,7 +9,7 @@ export class FacebookAthenticationService implements FacebookAuthentication {
     private readonly facebookApi: LoadFacebookUserApi,
     private readonly unserAccountRepo: LoadUserAccountRepository & CreateFacebookAccountRepository) {}
 
-  async perform (params: FacebookAuthentication.Params): Promise<AccessToken | AuthenticationError> {
+  public async perform (params: FacebookAuthentication.Params): Promise<AccessToken | AuthenticationError> {
     const fbData = await this.facebookApi.loadUser(params)
     if (fbData !== undefined) {
       await this.unserAccountRepo.load({ email: fbData.email })
