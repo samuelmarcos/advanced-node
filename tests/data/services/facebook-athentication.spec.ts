@@ -2,11 +2,11 @@ import { AuthenticationError } from '@/domain/errors'
 import { type LoadFacebookUserApi } from '@/data/contracts/apis'
 import { FacebookAthenticationService } from '@/data/services'
 import { mock, type MockProxy } from 'jest-mock-extended'
-import { type CreateFacebookAccountRepository, type LoadUserAccountRepository } from '@/data/contracts/repos'
+import { type UpdateFacebookAccountRepository, type CreateFacebookAccountRepository, type LoadUserAccountRepository } from '@/data/contracts/repos'
 
 describe('Facebook Athentication Service', () => {
   let facebookApi: MockProxy<LoadFacebookUserApi>
-  let userAccountRepo: MockProxy<LoadUserAccountRepository & CreateFacebookAccountRepository>
+  let userAccountRepo: MockProxy<LoadUserAccountRepository & CreateFacebookAccountRepository & UpdateFacebookAccountRepository>
   let sut: FacebookAthenticationService
   const token = 'any_token'
 
@@ -39,7 +39,7 @@ describe('Facebook Athentication Service', () => {
     expect(userAccountRepo.load).toHaveBeenCalledTimes(1)
   })
 
-  it('shoud call CreateUserAccountRepo when LoadUserAccountRepo returns undefined', async () => {
+  it('shoud call CreateFacebookAccountRepo when LoadUserAccountRepo returns undefined', async () => {
     userAccountRepo.load.mockResolvedValueOnce = undefined
     await sut.perform({ token })
     expect(userAccountRepo.createFromFacebook).toHaveBeenCalledWith({
@@ -48,5 +48,20 @@ describe('Facebook Athentication Service', () => {
       facebookId: 'any_fb_id'
     })
     expect(userAccountRepo.createFromFacebook).toHaveBeenCalledTimes(1)
+  })
+
+  it('shoud call UpdateacebookAccountRepo when LoadUserAccountRepo returns data', async () => {
+    userAccountRepo.load.mockResolvedValueOnce({
+      id: 'any_id',
+      name: 'any_name'
+    })
+
+    await sut.perform({ token })
+    expect(userAccountRepo.updateWithFacebook).toHaveBeenCalledWith({
+      name: 'any_name',
+      id: 'any_id',
+      facebookId: 'any_fb_id'
+    })
+    expect(userAccountRepo.updateWithFacebook).toHaveBeenCalledTimes(1)
   })
 })
