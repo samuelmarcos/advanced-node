@@ -2,7 +2,7 @@ import { AuthenticationError } from '@/domain/errors'
 import { type LoadFacebookUserApi } from '@/data/contracts/apis'
 import { FacebookAthenticationService } from '@/data/services'
 import { type SaveFacebookAccountRepository, type LoadUserAccountRepository } from '@/data/contracts/repos'
-import { FacebookAccount } from '@/domain/models'
+import { AccessToken, FacebookAccount } from '@/domain/models'
 import { type TokenGenerator } from '@/data/contracts/crypto'
 
 import { mock, type MockProxy } from 'jest-mock-extended'
@@ -25,13 +25,15 @@ describe('Facebook Athentication Service', () => {
       facebookId: 'any_fb_id'
     })
     userAccountRepo = mock()
-    crypto = mock()
     userAccountRepo.load.mockResolvedValue(undefined)
     userAccountRepo.saveWithFromFacebook.mockResolvedValue({ id: 'any_account_id' })
+    crypto = mock()
+    crypto.generateToken.mockResolvedValue('any_generated_token')
     sut = new FacebookAthenticationService(
       facebookApi,
       userAccountRepo,
-      crypto)
+      crypto
+    )
   })
 
   it('shoud call LoadFacebookUserApi with correct params', async () => {
@@ -41,8 +43,8 @@ describe('Facebook Athentication Service', () => {
   })
 
   it('shoud return AuthenticationError when LoadFacebookUserApi returns undefined', async () => {
-    const authResult = await sut.perform({ token })
     facebookApi.loadUser.mockResolvedValueOnce(undefined)
+    const authResult = await sut.perform({ token })
     expect(authResult).toEqual(new AuthenticationError())
   })
 
@@ -65,7 +67,15 @@ describe('Facebook Athentication Service', () => {
 
   it('shoud call TokenGenerator with correct params', async () => {
     await sut.perform({ token })
-    expect(crypto.generateToken).toHaveBeenCalledWith({ key: 'any_account_id' })
+    expect(crypto.generateToken).toHaveBeenCalledWith({
+      key: 'any_account_id',
+      expirationInMs: AccessToken.expirationInMs
+    })
     expect(crypto.generateToken).toHaveBeenCalledTimes(1)
+  })
+
+  it('shoud return an AccessToken on success', async () => {
+    const authResult = await sut.perform({ token })
+    expect(authResult).toEqual(new AccessToken('any_generated_token'))
   })
 })
