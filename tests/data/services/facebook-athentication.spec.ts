@@ -78,4 +78,28 @@ describe('Facebook Athentication Service', () => {
     const authResult = await sut.perform({ token })
     expect(authResult).toEqual(new AccessToken('any_generated_token'))
   })
+
+  it('shoud rethrow if LoadFacebookUserApi throws', async () => {
+    facebookApi.loadUser.mockRejectedValueOnce(new Error('fb_errror'))
+    const promise = sut.perform({ token })
+    await expect(promise).rejects.toThrow(new Error('fb_errror'))
+  })
+
+  it('shoud rethrow if LoadFacebookUserApi throws', async () => {
+    userAccountRepo.load.mockRejectedValueOnce(new Error('load_errror'))
+    const promise = sut.perform({ token })
+    await expect(promise).rejects.toThrow(new Error('load_errror'))
+  })
+
+  it('shoud rethrow if SaveFacebookAccountRepository throws', async () => {
+    userAccountRepo.saveWithFromFacebook.mockRejectedValueOnce(new Error('save_error'))
+    const promise = sut.perform({ token })
+    await expect(promise).rejects.toThrow(new Error('save_error'))
+  })
+
+  it('shoud rethrow if TokenGenerator throws', async () => {
+    crypto.generateToken.mockRejectedValueOnce(new Error('token_error'))
+    const promise = sut.perform({ token })
+    await expect(promise).rejects.toThrow(new Error('token_error'))
+  })
 })
