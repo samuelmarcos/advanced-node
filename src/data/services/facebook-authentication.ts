@@ -9,7 +9,8 @@ export class FacebookAthenticationService implements FacebookAuthentication {
   constructor (
     private readonly facebookApi: LoadFacebookUserApi,
     private readonly unserAccountRepo: LoadUserAccountRepository & SaveFacebookAccountRepository,
-    private readonly crypto: TokenGenerator) {}
+    private readonly crypto: TokenGenerator
+  ) {}
 
   public async perform (params: FacebookAuthentication.Params): Promise<FacebookAuthentication.Result | AuthenticationError> {
     const fbData = await this.facebookApi.loadUser(params)
@@ -20,7 +21,6 @@ export class FacebookAthenticationService implements FacebookAuthentication {
       const token = await this.crypto.generateToken({ key: id, expirationInMs: AccessToken.expirationInMs })
       return new AccessToken(token)
     }
-
     return new AuthenticationError()
   }
 }
