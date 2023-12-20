@@ -10,7 +10,9 @@
     "paths": {
       "@/tests/*": ["../tests/*"],
       "@/*": ["*"]
-    }
+    },
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
   },
   "strict": true,
   // "strictNullChecks": true,
