@@ -1,5 +1,5 @@
 import { type FacebookAuthentication } from '@/domain/features'
-import { mock } from 'jest-mock-extended'
+import { type MockProxy, mock } from 'jest-mock-extended'
 
 type HttpResponse = {
   statusCode: number
@@ -20,11 +20,13 @@ class FacebookLoginController {
 
 describe('FacebookLoginController', () => {
   let sut: FacebookLoginController
-  let facebookAuth: FacebookAuthentication
+  let facebookAuth: MockProxy<FacebookAuthentication>
 
   beforeAll(() => {
-    facebookAuth = mock<FacebookAuthentication>()
+    facebookAuth = mock()
+  })
 
+  beforeEach(() => {
     sut = new FacebookLoginController(facebookAuth)
   })
 
