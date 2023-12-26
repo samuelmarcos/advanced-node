@@ -3,7 +3,7 @@ type HttpResponse = {
   data: any
 }
 
-class FacebookController {
+class FacebookLoginController {
   public async handle (httpRequest: any): Promise<HttpResponse> {
     return {
       statusCode: 400,
@@ -14,9 +14,20 @@ class FacebookController {
 
 describe('FacebookLoginController', () => {
   it('shoud return 400 if token is empty', async () => {
-    const sut = new FacebookController()
+    const sut = new FacebookLoginController()
 
     const httpResponse = await sut.handle({ token: '' })
+
+    expect(httpResponse).toEqual({
+      statusCode: 400,
+      data: new Error('The field token is required')
+    })
+  })
+
+  it('shoud return 400 if token is null', async () => {
+    const sut = new FacebookLoginController()
+
+    const httpResponse = await sut.handle({ token: null })
 
     expect(httpResponse).toEqual({
       statusCode: 400,
