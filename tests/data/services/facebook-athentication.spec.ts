@@ -27,7 +27,7 @@ describe('Facebook Athentication Service', () => {
     })
     userAccountRepo = mock()
     userAccountRepo.load.mockResolvedValue(undefined)
-    userAccountRepo.saveWithFromFacebook.mockResolvedValue({ id: 'any_account_id' })
+    userAccountRepo.saveWithFacebook.mockResolvedValue({ id: 'any_account_id' })
     crypto = mock()
     crypto.generateToken.mockResolvedValue('any_generated_token')
   })
@@ -65,8 +65,8 @@ describe('Facebook Athentication Service', () => {
     mocked(FacebookAccount).mockImplementation(facebookAccountStub)
 
     await sut.perform({ token })
-    expect(userAccountRepo.saveWithFromFacebook).toHaveBeenCalledWith({})
-    expect(userAccountRepo.saveWithFromFacebook).toHaveBeenCalledTimes(1)
+    expect(userAccountRepo.saveWithFacebook).toHaveBeenCalledWith({})
+    expect(userAccountRepo.saveWithFacebook).toHaveBeenCalledTimes(1)
   })
 
   it('shoud call TokenGenerator with correct params', async () => {
@@ -96,7 +96,7 @@ describe('Facebook Athentication Service', () => {
   })
 
   it('shoud rethrow if SaveFacebookAccountRepository throws', async () => {
-    userAccountRepo.saveWithFromFacebook.mockRejectedValueOnce(new Error('save_error'))
+    userAccountRepo.saveWithFacebook.mockRejectedValueOnce(new Error('save_error'))
     const promise = sut.perform({ token })
     await expect(promise).rejects.toThrow(new Error('save_error'))
   })
