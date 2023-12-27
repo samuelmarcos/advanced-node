@@ -1,7 +1,7 @@
 import { badRequest, unauthorized, type HttpResponse, serverError, ok } from '@/application/helpers'
 import { type FacebookAuthentication } from '@/domain/features'
 import { AccessToken } from '@/domain/models'
-import { RequiredStringValidator, ValidationComposite, ValidationBuilder } from '@/application/validation'
+import { ValidationComposite, ValidationBuilder } from '@/application/validation'
 
 type HttpRequest = {
   token: string | undefined | null
