@@ -44,10 +44,17 @@ describe('ValidationComposite', () => {
   })
 
   it('should return the first error', () => {
-    validator1.validate.mockReturnValue(new Error('validation_error1'))
+    validator1.validate.mockReturnValueOnce(new Error('validation_error1'))
     validator2.validate.mockReturnValue(new Error('validation_error2'))
     const error = sut.validate()
 
     expect(error).toEqual(new Error('validation_error1'))
+  })
+
+  it('should return the second error', () => {
+    validator2.validate.mockReturnValueOnce(new Error('validation_error2'))
+    const error = sut.validate()
+
+    expect(error).toEqual(new Error('validation_error2'))
   })
 })
