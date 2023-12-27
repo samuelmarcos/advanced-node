@@ -36,6 +36,14 @@ describe('PgUserAccountRepository', () => {
       expect(account).toEqual({ id: '1' })
     })
 
+    it('should return an account if email exists', async () => {
+      await pgUserRepo.save({ email: 'existing_email', name: 'any_name' })
+
+      const account = await sut.load({ email: 'existing_email' })
+
+      expect(account).toEqual({ id: '1', name: 'any_name' })
+    })
+
     it('should return undefined if email does not exists', async () => {
       const account = await sut.load({ email: 'new_email' })
 
