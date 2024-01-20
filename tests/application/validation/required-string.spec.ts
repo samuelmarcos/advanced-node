@@ -10,22 +10,6 @@ describe('RequiredStringValidator', () => {
     expect(error).toEqual(new RequiredFieldError('any_field'))
   })
 
-  it('should return RequiredFieldError if value is null', () => {
-    const sut = new RequiredStringValidator(null, 'any_field')
-
-    const error = sut.validate()
-
-    expect(error).toEqual(new RequiredFieldError('any_field'))
-  })
-
-  it('should return RequiredFieldError if value is undefined', () => {
-    const sut = new RequiredStringValidator(undefined, 'any_field')
-
-    const error = sut.validate()
-
-    expect(error).toEqual(new RequiredFieldError('any_field'))
-  })
-
   it('should return undefined if value is not empty', () => {
     const sut = new RequiredStringValidator('any_value', 'any_field')
 

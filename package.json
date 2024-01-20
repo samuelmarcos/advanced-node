@@ -4,8 +4,9 @@
   "description": "Estudo avançado sobre a linguagem Typescript",
   "main": "index.ts",
   "scripts": {
-    "start": " node dist/main/api/index.js",
-    "build": "rimraf dist && tsc -p tsconfig-build.json",
+    "start": " node dist/main/index.js",
+    "clean": "rimraf dist",
+    "build": "npm run clean && tsc -p tsconfig-build.json",
     "lint": "eslint \"**/*.{ts,tsx}\"",
     "lint:fix": "npm run lint -- --fix",
     "test": "jest --passWithNoTests --no-cache --runInBand",
@@ -20,6 +21,8 @@
   "license": "ISC",
   "devDependencies": {
     "@types/axios": "^0.14.0",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
     "@types/jest": "^29.5.9",
     "@types/jsonwebtoken": "^9.0.5",
     "@types/module-alias": "^2.0.4",
@@ -43,9 +46,14 @@
   },
   "dependencies": {
     "axios": "^1.6.2",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.11.3",
     "reflect-metadata": "^0.2.1",
     "typeorm": "0.2.29"
+  },
+  "engines": {
+    "node": "16.x"
   }
 }
