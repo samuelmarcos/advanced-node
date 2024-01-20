@@ -61,7 +61,7 @@ describe('PgUserAccountRepository', () => {
 
       const pgUser = await pgUserRepo.findOne({ email: 'any_email' })
 
-      expect(pgUser.id).toBe(1)
+      expect(pgUser!.id).toBe(1)
       expect(id).toBe('1')
     })
 
