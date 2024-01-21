@@ -22,4 +22,16 @@ describe('Express Router', () => {
 
     expect(controller.handle).toHaveBeenCalledWith({ any: 'any' })
   })
+
+  it('should call handle with amepty request', async () => {
+    const controller = mock<Controller>()
+    const sut = new ExpressRouter(controller)
+
+    const req = getMockReq()
+    const { res } = getMockRes()
+
+    await sut.adapt(req, res)
+
+    expect(controller.handle).toHaveBeenCalledWith({})
+  })
 })
