@@ -1,7 +1,8 @@
 import { type Router } from 'express'
 
 export default (router: Router): void => {
-  router.post('/api/login/facebook', (req, res) => {
+  router.post('/login/facebook', (req, res) => {
+    console.log('cheguei na rota')
     res.send({ data: 'any_Data' })
   })
 }
