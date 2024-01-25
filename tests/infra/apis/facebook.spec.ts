@@ -1,4 +1,4 @@
-import { type LoadFacebookUserApi } from '@/data/contracts/apis'
+import { type LoadFacebookUserApi } from '@/domain/contracts/apis'
 import { FacebookApi } from '@/infra/apis'
 import { type HttpGetClient } from '@/infra/http'
 

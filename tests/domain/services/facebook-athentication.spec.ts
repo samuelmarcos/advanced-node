@@ -1,9 +1,9 @@
 import { AuthenticationError } from '@/domain/errors'
-import { type LoadFacebookUserApi } from '@/data/contracts/apis'
-import { FacebookAthenticationService } from '@/data/services'
-import { type SaveFacebookAccountRepository, type LoadUserAccountRepository } from '@/data/contracts/repos'
+import { type LoadFacebookUserApi } from '@/domain/contracts/apis'
+import { FacebookAthenticationService } from '@/domain/services'
+import { type SaveFacebookAccountRepository, type LoadUserAccountRepository } from '@/domain/contracts/repos'
 import { AccessToken, FacebookAccount } from '@/domain/models'
-import { type TokenGenerator } from '@/data/contracts/crypto'
+import { type TokenGenerator } from '@/domain/contracts/crypto'
 
 import { mock, type MockProxy } from 'jest-mock-extended'
 import { mocked } from 'jest-mock'
