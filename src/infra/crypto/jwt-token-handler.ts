@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken'
 type Params = TokenGenerator.Params
 type Result = TokenGenerator.Result
 
-export class JwtTokenGenerator implements TokenGenerator {
+export class JwtTokenHandler implements TokenGenerator {
   constructor (private readonly secret: string) {}
 
   public async generateToken ({ expirationInMs, key }: Params): Promise<Result> {
