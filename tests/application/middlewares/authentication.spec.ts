@@ -1,20 +1,35 @@
 import { forbidden, type HttpResponse } from '@/application/helpers'
 import { ForbiddenError } from '@/application/errors'
+import { RequiredStringValidator } from '@/application/validation'
+import { type Authorize } from '@/domain/use-cases'
 
 type HttpRequest = {
   authorization: string
 }
 
 class AuthenticationMiddleware {
-  public async handle (HttpRequest: HttpRequest): Promise<HttpResponse> {
-    return forbidden()
+  constructor (private readonly authorize: Authorize) {}
+
+  public async handle ({ authorization }: HttpRequest): Promise<HttpResponse | undefined> {
+    const error = new RequiredStringValidator(authorization, 'authorization').validate()
+    if (error !== undefined) return forbidden()
+
+    await this.authorize({ token: authorization })
   }
 }
 
 describe('AuthenticationMiddleware', () => {
   let sut: AuthenticationMiddleware
+  let authorize: jest.Mock
+  let authorization: string
+
+  beforeAll(() => {
+    authorization = 'any_authorization'
+    authorize = jest.fn()
+  })
+
   beforeEach(() => {
-    sut = new AuthenticationMiddleware()
+    sut = new AuthenticationMiddleware(authorize)
   })
 
   it('shoud return 403 if authorization is empty', async () => {
@@ -42,5 +57,11 @@ describe('AuthenticationMiddleware', () => {
       statusCode: 403,
       data: new ForbiddenError()
     })
+  })
+
+  it('shoud call authorize with correct input', async () => {
+    await sut.handle({ authorization })
+
+    expect(authorize).toHaveBeenCalledWith({ token: authorization })
   })
 })
