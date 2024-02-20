@@ -30,7 +30,7 @@ describe('JwtTokenHandler', () => {
     })
 
     it('should call sign with correct params', async () => {
-      await sut.generateToken({
+      await sut.generate({
         key,
         expirationInMs
       })
@@ -40,7 +40,7 @@ describe('JwtTokenHandler', () => {
     })
 
     it('should return a token', async () => {
-      const generatedToken = await sut.generateToken({
+      const generatedToken = await sut.generate({
         key,
         expirationInMs
       })
@@ -51,7 +51,7 @@ describe('JwtTokenHandler', () => {
     it('should rethrow if jwt get throws', async () => {
       fakeJwt.sign.mockImplementationOnce(() => { throw new Error('any_jwt_error') })
 
-      const promise = sut.generateToken({
+      const promise = sut.generate({
         key,
         expirationInMs: 1000
       })
@@ -71,14 +71,14 @@ describe('JwtTokenHandler', () => {
     })
 
     it('should call sign with correct params', async () => {
-      await sut.validateToken({ token })
+      await sut.validate({ token })
 
       expect(fakeJwt.verify).toHaveBeenCalledWith(token, secret)
       expect(fakeJwt.verify).toHaveBeenCalledTimes(1)
     })
 
     it('should return the used to sign', async () => {
-      const ganeratedKey = await sut.validateToken({ token })
+      const ganeratedKey = await sut.validate({ token })
 
       expect(ganeratedKey).toBe(key)
       expect(fakeJwt.verify).toHaveBeenCalledTimes(1)
@@ -87,7 +87,7 @@ describe('JwtTokenHandler', () => {
     it('should rethrow if jwt get throws', async () => {
       fakeJwt.verify.mockImplementationOnce(() => { throw new Error('key_error') })
 
-      const promise = sut.validateToken({ token })
+      const promise = sut.validate({ token })
 
       await expect(promise).rejects.toThrow(new Error('key_error'))
     })
@@ -95,7 +95,7 @@ describe('JwtTokenHandler', () => {
     it('should throw if verify returns null', async () => {
       fakeJwt.verify.mockImplementationOnce(() => null)
 
-      const promise = sut.validateToken({ token })
+      const promise = sut.validate({ token })
 
       await expect(promise).rejects.toThrow()
     })

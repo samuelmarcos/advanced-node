@@ -1,4 +1,4 @@
-import { type LoadFacebookUserApi } from '@/domain/contracts/apis'
+import { type LoadFacebookUser } from '@/domain/contracts/gateways'
 import { FacebookApi } from '@/infra/apis'
 import { type HttpGetClient } from '@/infra/http'
 
@@ -8,7 +8,7 @@ describe('FacebookApi', () => {
   let clientId: string
   let clientSecret: string
   let httpClient: MockProxy<HttpGetClient>
-  let sut: LoadFacebookUserApi
+  let sut: LoadFacebookUser
 
   beforeAll(() => {
     clientId = 'any_client_id'

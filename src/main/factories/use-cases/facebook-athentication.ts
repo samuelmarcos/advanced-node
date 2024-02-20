@@ -1,8 +1,7 @@
 import { setupFacebookAthentication, type FacebookAuthentication } from '@/domain/use-cases'
-import { makeFacebookApi } from '../apis'
+import { makeFacebookApi, makeJWTokenHandler } from '../gateways'
 import { makePgUserAccount } from '../repos'
-import { makeJWTokenGerator } from '../crypto'
 
 export const makeFacebookAuthentication = (): FacebookAuthentication => {
-  return setupFacebookAthentication(makeFacebookApi(), makePgUserAccount(), makeJWTokenGerator())
+  return setupFacebookAthentication(makeFacebookApi(), makePgUserAccount(), makeJWTokenHandler())
 }

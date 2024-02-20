@@ -1,8 +1,8 @@
 import { AuthenticationMiddleware } from '@/application/middlewares'
-import { makeJWTokenGerator } from '@/main/factories/crypto'
+import { makeJWTokenHandler } from '@/main/factories/gateways'
 
 export const makeAuthenticationMiddleware = (): AuthenticationMiddleware => {
-  const jwt = makeJWTokenGerator()
+  const jwt = makeJWTokenHandler()
   // passando com bind, será passado uma instância do this e não perdera as propriedades ao ser passado como função
-  return new AuthenticationMiddleware(jwt.validateToken.bind(jwt))
+  return new AuthenticationMiddleware(jwt.validate.bind(jwt))
 }

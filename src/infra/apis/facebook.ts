@@ -1,5 +1,5 @@
 import { type HttpGetClient } from '@/infra/http'
-import { type LoadFacebookUserApi } from '@/domain/contracts/apis'
+import { type LoadFacebookUser } from '@/domain/contracts/gateways'
 
 type AppToken = {
   access_token: string
@@ -17,10 +17,10 @@ type UserInfo = {
   email: string
 }
 
-type Params = LoadFacebookUserApi.Input
-type Result = LoadFacebookUserApi.Output
+type Params = LoadFacebookUser.Input
+type Result = LoadFacebookUser.Output
 
-export class FacebookApi implements LoadFacebookUserApi {
+export class FacebookApi implements LoadFacebookUser {
   private readonly baseUrl = 'https://graph.facebook.com'
 
   constructor (
