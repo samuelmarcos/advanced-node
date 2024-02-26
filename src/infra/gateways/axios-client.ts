@@ -1,4 +1,4 @@
-import { type HttpGetClient } from '@/infra/http'
+import { type HttpGetClient } from './client'
 import axios from 'axios'
 
 type Params = HttpGetClient.Input

@@ -1,5 +1,5 @@
-import { FacebookApi } from '@/infra/apis'
-import { AxiosHttpClient } from '@/infra/http'
+import { FacebookApi } from '@/infra/gateways'
+import { AxiosHttpClient } from '@/infra/gateways/http'
 import { env } from '@/main/config/env'
 
 /// REFATORAR TESTE QUANDO CONSEGUIR CRIAR USUÁRIO DE TESTE

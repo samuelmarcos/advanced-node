@@ -1,6 +1,6 @@
 import { type LoadFacebookUser } from '@/domain/contracts/gateways'
-import { FacebookApi } from '@/infra/apis'
-import { type HttpGetClient } from '@/infra/http'
+import { FacebookApi } from '@/infra/gateways'
+import { type HttpGetClient } from '@/infra/gateways'
 
 import { mock, type MockProxy } from 'jest-mock-extended'
 

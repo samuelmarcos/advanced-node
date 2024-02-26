@@ -10,7 +10,7 @@ describe('LoginRoutes', () => {
   describe('POST /login/facebook', () => {
     const laodUserSpy = jest.fn()
 
-    jest.mock('@/infra/apis/facebook', () => ({
+    jest.mock('@/infra/gateways/facebook', () => ({
       FacebookApi: jest.fn().mockReturnValue({
         loadUser: laodUserSpy
       })

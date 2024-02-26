@@ -1,6 +1,6 @@
 import { mocked } from 'jest-mock'
 import { v4 } from 'uuid'
-import { UUIHandler } from '@/infra/crypto'
+import { UUIHandler } from '@/infra/gateways'
 
 jest.mock('uuid')
 
