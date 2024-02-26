@@ -26,6 +26,16 @@ describe('UserProfile', () => {
     })
   })
 
+  it('should create initials with two tinitials', () => {
+    sut.setPicture({ name: 'Samuel Barbosa' })
+
+    expect(sut).toEqual({
+      id: 'any_id',
+      pictureUrl: undefined,
+      initials: 'SB'
+    })
+  })
+
   it('should create initials with first letter', () => {
     sut.setPicture({ name: 'S' })
 
@@ -38,6 +48,16 @@ describe('UserProfile', () => {
 
   it('should create with empty initials when name and picture are not provided', () => {
     sut.setPicture({})
+
+    expect(sut).toEqual({
+      id: 'any_id',
+      pictureUrl: undefined,
+      initials: undefined
+    })
+  })
+
+  it('should create with empty initials when name and picture are not provided', () => {
+    sut.setPicture({ name: '' })
 
     expect(sut).toEqual({
       id: 'any_id',
