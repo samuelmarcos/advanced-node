@@ -14,7 +14,7 @@ describe('AwsS3FileStorage', () => {
     accessKey = 'any_access_key'
     secret = 'any_secret'
     bukcket = 'any_bucket'
-    key = 'any_key'
+    key = 'any key'
   })
 
   beforeEach(() => {
@@ -58,14 +58,8 @@ describe('AwsS3FileStorage', () => {
       expect(putObjectPromiseSpy).toHaveBeenCalledTimes(1)
     })
 
-    it('should return imageUrl', async () => {
-      const imageUrl = await sut.upload({ key, file })
-
-      expect(imageUrl).toBe(`https://${bukcket}.s3.amazonaws.com/${key}`)
-    })
-
     it('should return encoded imageUrl', async () => {
-      const imageUrl = await sut.upload({ key: 'any key', file })
+      const imageUrl = await sut.upload({ key, file })
 
       expect(imageUrl).toBe(`https://${bukcket}.s3.amazonaws.com/any%20key`)
     })
@@ -74,7 +68,7 @@ describe('AwsS3FileStorage', () => {
       const error = new Error('upload errro')
       putObjectPromiseSpy.mockRejectedValueOnce(error)
 
-      const promise = sut.upload({ key: 'any key', file })
+      const promise = sut.upload({ key, file })
 
       await expect(promise).rejects.toThrow()
     })
@@ -100,6 +94,15 @@ describe('AwsS3FileStorage', () => {
 
       expect(deleteObjectSpy).toHaveBeenCalledTimes(1)
       expect(deleteObjectPromiseSpy).toHaveBeenCalledTimes(1)
+    })
+
+    it('should rethrow if deleteObject throws', async () => {
+      const error = new Error('delete errro')
+      deleteObjectPromiseSpy.mockRejectedValueOnce(error)
+
+      const promise = sut.delete({ key })
+
+      await expect(promise).rejects.toThrow()
     })
   })
 })
