@@ -1,19 +1,4 @@
-import { type ChangeProfilePicture } from '@/domain/use-cases'
-import { noContent, type HttpResponse } from '@/application/helpers'
-import { Controller } from '@/application/controllers'
-
-type HttpRequest = { userId: string }
-
-export class DeletePictureController extends Controller {
-  constructor (private readonly changeProfilePicture: ChangeProfilePicture) {
-    super()
-  }
-
-  public async perform ({ userId }: HttpRequest): Promise<HttpResponse> {
-    await this.changeProfilePicture({ id: userId })
-    return noContent()
-  }
-}
+import { Controller, DeletePictureController } from '@/application/controllers'
 
 describe('DeletePicture', () => {
   let changeProfilePicture: jest.Mock
