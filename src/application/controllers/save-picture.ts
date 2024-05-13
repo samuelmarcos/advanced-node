@@ -1,8 +1,7 @@
 import { type ChangeProfilePicture } from '@/domain/use-cases'
-import { AllowedMimeTypes, MaxFileSize, Required, RequiredBuffer } from '@/application/validation'
-import { badRequest, ok, type HttpResponse } from '@/application/helpers/http'
-import { InvalidMimeTypeError, MaxFileSizeError, RequiredFieldError } from '@/application/errors'
-import { ValidationComposite, type Validator } from '@/application/validation'
+import { ok, type HttpResponse } from '@/application/helpers/http'
+import { type Validator, ValidationBuilder as Builder } from '@/application/validation'
+
 import { Controller } from './controller'
 
 type HttpRequest = { file: { buffer: Buffer, mimeType: string }, userId: string }
@@ -18,12 +17,13 @@ export class SavePictureController extends Controller {
     return ok(data)
   }
 
-  override buildValidators ({ file, userId }: any): Validator[] {
+  override buildValidators ({ file }: HttpRequest): Validator[] {
+    if (file === undefined) return []
     return [
-      new Required(file, 'file'),
-      new RequiredBuffer(file.buffer, 'file'),
-      new AllowedMimeTypes(['png', 'jpg'], file.mimeType),
-      new MaxFileSize(5, file.buffer)
+      ...Builder.of({ value: file, fieldName: 'file' })
+        .required()
+        .image({ allowed: ['png', 'jpg'], maxSizeInMb: 5 })
+        .build()
     ]
   }
 }
