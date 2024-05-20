@@ -15,6 +15,7 @@
     "test:coverage": "npm test -- --coverage",
     "test:staged": "npm test -- --findRelatedTests",
     "test:fb-api": "npm test -- -c ./jest.integration.config.js tests/external/facebook-api.test.ts",
+    "test:s3": "npm test -- -c ./jest.integration.config.js tests/external/aws-s3-file-storage.test.ts",
     "prepare": "husky install"
   },
   "keywords": [],
