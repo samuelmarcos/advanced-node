@@ -1,17 +1,21 @@
 import { app } from '@/main/config/app'
 import { makeFakeDB } from '@/tests/infra/postgres/mocks'
-import { UnauthorizedError } from '@/application/errors'
 
-import { getConnection } from 'typeorm'
+import { type Repository, getConnection, getRepository } from 'typeorm'
 import { type IBackup } from 'pg-mem'
 import request from 'supertest'
+import { sign } from 'jsonwebtoken'
+import { PgUser } from '@/infra/repos/postgres/entities'
+import { env } from '@/main/config/env'
 
 describe('UserRoutes', () => {
   describe('DELETE /users/picture', () => {
     let backup: IBackup
+    let pgUserRepo: Repository<PgUser>
 
     beforeAll(async () => {
       const db = await makeFakeDB()
+      pgUserRepo = getRepository(PgUser)
       backup = db.backup()
     })
 
@@ -31,6 +35,18 @@ describe('UserRoutes', () => {
         .delete('/api/users/picture')
 
       expect(status).toBe(403)
+    })
+
+    it('should return 204', async () => {
+      const { id } = await pgUserRepo.save({ email: 'any_meail' })
+      const authorization: string = sign({ key: id }, env.jwtSecret)
+
+      const { status, body } = await request(app)
+        .delete('/api/users/picture')
+        .set({ authorization })
+
+      expect(status).toBe(204)
+      expect(body).toEqual({})
     })
   })
 })

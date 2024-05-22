@@ -1,3 +1,5 @@
 export * from './make-facebook-api'
 export * from './jwt-token-handler'
 export * from './axios-http'
+export * from './file-storage'
+export * from './uuid'
