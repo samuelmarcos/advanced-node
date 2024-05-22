@@ -9,7 +9,9 @@ jest.mock('@/domain/entities/user-profile')
 
 describe('ChangeProfilePicture', () => {
   let uuid: string
-  let file: Buffer
+  let buffer: Buffer
+  let mimeType: string
+  let file: { buffer: Buffer, mimeType: string }
   let fileStorage: MockProxy<UploadFile & DeleteFile>
   let crypto: MockProxy<UUIDGenerator>
   let userProfileRepo: MockProxy<SaveUserPicture & LoadUserProfile>
@@ -17,7 +19,9 @@ describe('ChangeProfilePicture', () => {
 
   beforeAll(() => {
     uuid = 'any_unique_id'
-    file = Buffer.from('any_buffer')
+    mimeType = 'image/png'
+    buffer = Buffer.from('any_buffer')
+    file = { buffer, mimeType }
     fileStorage = mock()
     userProfileRepo = mock()
     fileStorage.upload.mockResolvedValue('any_url')
@@ -31,16 +35,16 @@ describe('ChangeProfilePicture', () => {
   })
 
   it('should call UploadFile with correct input', async () => {
-    await sut({ file, id: 'any_id' })
+    await sut({ file: { buffer, mimeType: 'image/png' }, id: 'any_id' })
 
-    expect(fileStorage.upload).toHaveBeenCalledWith({ file, key: 'any_unique_id' })
+    expect(fileStorage.upload).toHaveBeenCalledWith({ file: buffer, fileName: `${uuid}.png` })
     expect(fileStorage.upload).toHaveBeenCalledTimes(1)
   })
 
   it('should not call UploadFile when file is undefined', async () => {
     await sut({ id: 'any_id', file: undefined })
 
-    expect(fileStorage.upload).not.toHaveBeenCalledWith({ file, key: 'any_unique_id' })
+    expect(fileStorage.upload).not.toHaveBeenCalledWith({ file, fileName: 'any_unique_id' })
   })
 
   it('should call SaveUserPicture with correct input', async () => {
@@ -87,7 +91,7 @@ describe('ChangeProfilePicture', () => {
     const promise = sut({ id: 'any_id', file })
 
     promise.catch(() => {
-      expect(fileStorage.delete).toHaveBeenCalledWith({ key: uuid })
+      expect(fileStorage.delete).toHaveBeenCalledWith({ fileName: uuid })
       expect(fileStorage.delete).toHaveBeenCalledTimes(1)
     })
   })
