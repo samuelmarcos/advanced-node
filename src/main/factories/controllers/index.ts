@@ -1,2 +1,2 @@
 export * from './facebook-login'
-export * from './delete-pictur'
+export * from './save-picture'

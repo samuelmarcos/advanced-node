@@ -4,8 +4,8 @@ import { type Validator, ValidationBuilder as Builder } from '@/application/vali
 
 import { Controller } from './controller'
 
-type HttpRequest = { file: { buffer: Buffer, mimeType: string }, userId: string }
-type Model = Error | { pictureUrl?: string, initials?: string }
+type HttpRequest = { file?: { buffer: Buffer, mimeType: string }, userId: string }
+type Model = { pictureUrl?: string, initials?: string }
 
 export class SavePictureController extends Controller {
   constructor (private readonly changeProfilePicture: ChangeProfilePicture) {
@@ -13,8 +13,8 @@ export class SavePictureController extends Controller {
   }
 
   override async perform ({ file, userId }: HttpRequest): Promise<HttpResponse<Model>> {
-    const data = await this.changeProfilePicture({ id: userId, file })
-    return ok(data)
+    const { initials, pictureUrl } = await this.changeProfilePicture({ id: userId, file })
+    return ok({ initials, pictureUrl })
   }
 
   override buildValidators ({ file }: HttpRequest): Validator[] {
