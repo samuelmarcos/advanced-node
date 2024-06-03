@@ -3,6 +3,7 @@
     "parserOptions": {
       "project": "./tsconfig.json"
     },
+    "ignorePatterns": ["ormconfig.ts"],
     "rules": {
       "@typescript-eslint/consistent-type-definitions": "off",
       "@typescript-eslint/no-namespace": "off",
