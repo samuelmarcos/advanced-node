@@ -1,12 +1,14 @@
 import { app } from '@/main/config/app'
 import { makeFakeDB } from '@/tests/infra/postgres/mocks'
 import { UnauthorizedError } from '@/application/errors'
+import { PgConnection } from '@/infra/repos/postgres/helpers'
 
-import { getConnection } from 'typeorm'
 import { type IBackup } from 'pg-mem'
 import request from 'supertest'
 
 describe('LoginRoutes', () => {
+  let connection: PgConnection
+
   describe('POST /login/facebook', () => {
     const laodUserSpy = jest.fn()
 
@@ -19,15 +21,13 @@ describe('LoginRoutes', () => {
     let backup: IBackup
 
     beforeAll(async () => {
+      connection = PgConnection.getInstance()
       const db = await makeFakeDB()
       backup = db.backup()
     })
 
     afterAll(async () => {
-      const conn = getConnection()
-      if (conn.isConnected) {
-        await conn.close()
-      }
+      await connection.disconnect()
     })
 
     beforeEach(() => {

@@ -1,5 +1,6 @@
 import { app } from '@/main/config/app'
 import { makeFakeDB } from '@/tests/infra/postgres/mocks'
+import { PgConnection } from '@/infra/repos/postgres/helpers'
 
 import { type Repository, getConnection, getRepository } from 'typeorm'
 import { type IBackup } from 'pg-mem'
@@ -9,20 +10,19 @@ import { PgUser } from '@/infra/repos/postgres/entities'
 import { env } from '@/main/config/env'
 
 describe('UserRoutes', () => {
+  let connection: PgConnection
   let backup: IBackup
   let pgUserRepo: Repository<PgUser>
 
   beforeAll(async () => {
+    connection = PgConnection.getInstance()
     const db = await makeFakeDB()
     pgUserRepo = getRepository(PgUser)
     backup = db.backup()
   })
 
   afterAll(async () => {
-    const conn = getConnection()
-    if (conn.isConnected) {
-      await conn.close()
-    }
+    await connection.disconnect()
   })
 
   beforeEach(() => {
