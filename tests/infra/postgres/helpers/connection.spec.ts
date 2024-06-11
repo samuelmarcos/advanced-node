@@ -1,7 +1,6 @@
 import { ConnectionNotFoundError, PgConnection } from '@/infra/repos/postgres/helpers'
 
 import { mocked } from 'jest-mock'
-import { release } from 'os'
 import { createConnection, getConnection, getConnectionManager } from 'typeorm'
 
 jest.mock('typeorm', () => ({
@@ -23,10 +22,14 @@ describe('PgConnection', () => {
   let closeSpy: jest.Mock
   let startTransactionSpy: jest.Mock
   let releaseSpy: jest.Mock
+  let commitTransactionSpy: jest.Mock
+  let rollbackTransactionSpy: jest.Mock
 
   beforeAll(() => {
     startTransactionSpy = jest.fn()
     releaseSpy = jest.fn()
+    commitTransactionSpy = jest.fn()
+    rollbackTransactionSpy = jest.fn()
     hasSpy = jest.fn().mockReturnValue(true)
     closeSpy = jest.fn()
     getConnectionManagerSpy = jest.fn().mockReturnValue({
@@ -35,6 +38,8 @@ describe('PgConnection', () => {
     mocked(getConnectionManager).mockImplementation(getConnectionManagerSpy)
     createQueryRunnerSpy = jest.fn().mockReturnValue({
       startTransaction: startTransactionSpy,
+      commitTransaction: commitTransactionSpy,
+      rollbackTransaction: rollbackTransactionSpy,
       release: releaseSpy
     })
     createConnectionSpy = jest.fn().mockResolvedValue({
@@ -93,7 +98,7 @@ describe('PgConnection', () => {
     await expect(promise).rejects.toThrow(new ConnectionNotFoundError())
   })
 
-  it('shoud openTransaction', async () => {
+  it('shoud open Transaction', async () => {
     await sut.connect()
     await sut.openTransaction()
 
@@ -103,14 +108,14 @@ describe('PgConnection', () => {
     await sut.disconnect()
   })
 
-  it('shoud return ConnectionNotFoundError on openTransaction if connect is not found', async () => {
+  it('shoud return ConnectionNotFoundError on open Transaction if connect is not found', async () => {
     const promise = sut.openTransaction()
 
     expect(startTransactionSpy).not.toHaveBeenCalled()
     await expect(promise).rejects.toThrow(new ConnectionNotFoundError())
   })
 
-  it('shoud closeTransaction', async () => {
+  it('shoud close Transaction', async () => {
     await sut.connect()
     await sut.closeTransaction()
 
@@ -120,10 +125,44 @@ describe('PgConnection', () => {
     await sut.disconnect()
   })
 
-  it('shoud return ConnectionNotFoundError on closeTransaction if connect is not found', async () => {
+  it('shoud return ConnectionNotFoundError on commit if connect is not found', async () => {
     const promise = sut.closeTransaction()
 
     expect(releaseSpy).not.toHaveBeenCalled()
+    await expect(promise).rejects.toThrow(new ConnectionNotFoundError())
+  })
+
+  it('shoud commit Transaction', async () => {
+    await sut.connect()
+    await sut.commit()
+
+    expect(commitTransactionSpy).toHaveBeenCalled()
+    expect(commitTransactionSpy).toHaveBeenCalledTimes(1)
+
+    await sut.disconnect()
+  })
+
+  it('shoud return ConnectionNotFoundError on commit if connect is not found', async () => {
+    const promise = sut.commit()
+
+    expect(commitTransactionSpy).not.toHaveBeenCalled()
+    await expect(promise).rejects.toThrow(new ConnectionNotFoundError())
+  })
+
+  it('shoud rollback Transaction', async () => {
+    await sut.connect()
+    await sut.rollback()
+
+    expect(rollbackTransactionSpy).toHaveBeenCalled()
+    expect(rollbackTransactionSpy).toHaveBeenCalledTimes(1)
+
+    await sut.disconnect()
+  })
+
+  it('shoud return ConnectionNotFoundError on rollback if connect is not found', async () => {
+    const promise = sut.rollback()
+
+    expect(rollbackTransactionSpy).not.toHaveBeenCalled()
     await expect(promise).rejects.toThrow(new ConnectionNotFoundError())
   })
 })
