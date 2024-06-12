@@ -1,8 +1,8 @@
 import { PgUser } from '@/infra/repos/postgres/entities'
-import { ConnectionNotFoundError, PgConnection } from '@/infra/repos/postgres/helpers'
+import { PgConnection, ConnectionNotFoundError, TransactionNotFoundError } from '@/infra/repos/postgres/helpers'
 
 import { mocked } from 'jest-mock'
-import { createConnection, getConnection, getConnectionManager } from 'typeorm'
+import { createConnection, getConnection, getConnectionManager, getRepository } from 'typeorm'
 
 jest.mock('typeorm', () => ({
   Entity: jest.fn(),
@@ -10,11 +10,11 @@ jest.mock('typeorm', () => ({
   Column: jest.fn(),
   createConnection: jest.fn(),
   getConnection: jest.fn(),
-  getConnectionManager: jest.fn()
+  getConnectionManager: jest.fn(),
+  getRepository: jest.fn()
 }))
 
 describe('PgConnection', () => {
-  let sut: PgConnection
   let getConnectionManagerSpy: jest.Mock
   let createQueryRunnerSpy: jest.Mock
   let createConnectionSpy: jest.Mock
@@ -26,70 +26,66 @@ describe('PgConnection', () => {
   let commitTransactionSpy: jest.Mock
   let rollbackTransactionSpy: jest.Mock
   let getRepositorySpy: jest.Mock
+  let sut: PgConnection
 
   beforeAll(() => {
-    startTransactionSpy = jest.fn()
-    releaseSpy = jest.fn()
-    getRepositorySpy = jest.fn().mockReturnValue('any_repo')
-    commitTransactionSpy = jest.fn()
-    rollbackTransactionSpy = jest.fn()
     hasSpy = jest.fn().mockReturnValue(true)
-    closeSpy = jest.fn()
     getConnectionManagerSpy = jest.fn().mockReturnValue({
       has: hasSpy
     })
-    mocked(getConnectionManager).mockImplementation(getConnectionManagerSpy)
+    startTransactionSpy = jest.fn()
+    commitTransactionSpy = jest.fn()
+    rollbackTransactionSpy = jest.fn()
+    releaseSpy = jest.fn()
+    getRepositorySpy = jest.fn().mockReturnValue('any_repo')
     createQueryRunnerSpy = jest.fn().mockReturnValue({
       startTransaction: startTransactionSpy,
       commitTransaction: commitTransactionSpy,
       rollbackTransaction: rollbackTransactionSpy,
       release: releaseSpy,
-      manager: {
-        getRepository: getRepositorySpy
-      }
+      manager: { getRepository: getRepositorySpy }
     })
     createConnectionSpy = jest.fn().mockResolvedValue({
       createQueryRunner: createQueryRunnerSpy
     })
-    mocked(createConnection).mockImplementation(createConnectionSpy)
+    closeSpy = jest.fn()
     getConnectionSpy = jest.fn().mockReturnValue({
       createQueryRunner: createQueryRunnerSpy,
       close: closeSpy
     })
-
+    mocked(createConnection).mockImplementation(createConnectionSpy)
+    mocked(getConnectionManager).mockImplementation(getConnectionManagerSpy)
     mocked(getConnection).mockImplementation(getConnectionSpy)
+    mocked(getRepository).mockImplementation(getRepositorySpy)
   })
 
   beforeEach(() => {
     sut = PgConnection.getInstance()
   })
 
-  it('shoud had only one instance', async () => {
-    hasSpy.mockReturnValueOnce(false)
+  it('should have only one instance', () => {
     const sut2 = PgConnection.getInstance()
 
     expect(sut).toBe(sut2)
   })
 
-  it('shoud create a new connection', async () => {
+  it('should create a new connection', async () => {
+    hasSpy.mockReturnValueOnce(false)
+
     await sut.connect()
 
     expect(createConnectionSpy).toHaveBeenCalledWith()
     expect(createConnectionSpy).toHaveBeenCalledTimes(1)
-    expect(createQueryRunnerSpy).toHaveBeenCalledWith()
-    expect(createQueryRunnerSpy).toHaveBeenCalledTimes(1)
   })
 
-  it('shoud use an existing connection', async () => {
+  it('should use an existing connection', async () => {
     await sut.connect()
 
     expect(getConnectionSpy).toHaveBeenCalledWith()
     expect(getConnectionSpy).toHaveBeenCalledTimes(1)
-    expect(createQueryRunnerSpy).toHaveBeenCalledWith()
-    expect(createQueryRunnerSpy).toHaveBeenCalledTimes(1)
   })
 
-  it('shoud close connection', async () => {
+  it('should close connection', async () => {
     await sut.connect()
     await sut.disconnect()
 
@@ -97,93 +93,110 @@ describe('PgConnection', () => {
     expect(closeSpy).toHaveBeenCalledTimes(1)
   })
 
-  it('shoud return ConnectionNotFoundError on disconnect if connect is not found', async () => {
+  it('should return ConnectionNotFoundError on disconnect if connection is not found', async () => {
     const promise = sut.disconnect()
 
     expect(closeSpy).not.toHaveBeenCalled()
     await expect(promise).rejects.toThrow(new ConnectionNotFoundError())
   })
 
-  it('shoud open Transaction', async () => {
+  it('should open transaction', async () => {
     await sut.connect()
     await sut.openTransaction()
 
-    expect(startTransactionSpy).toHaveBeenCalled()
+    expect(startTransactionSpy).toHaveBeenCalledWith()
     expect(startTransactionSpy).toHaveBeenCalledTimes(1)
+    expect(createQueryRunnerSpy).toHaveBeenCalledWith()
+    expect(createQueryRunnerSpy).toHaveBeenCalledTimes(1)
 
     await sut.disconnect()
   })
 
-  it('shoud return ConnectionNotFoundError on open Transaction if connect is not found', async () => {
+  it('should return ConnectionNotFoundError on openTransaction if connection is not found', async () => {
     const promise = sut.openTransaction()
 
     expect(startTransactionSpy).not.toHaveBeenCalled()
     await expect(promise).rejects.toThrow(new ConnectionNotFoundError())
   })
 
-  it('shoud close Transaction', async () => {
+  it('should close transaction', async () => {
     await sut.connect()
+    await sut.openTransaction()
     await sut.closeTransaction()
 
-    expect(releaseSpy).toHaveBeenCalled()
+    expect(releaseSpy).toHaveBeenCalledWith()
     expect(releaseSpy).toHaveBeenCalledTimes(1)
 
     await sut.disconnect()
   })
 
-  it('shoud return ConnectionNotFoundError on commit if connect is not found', async () => {
+  it('should return TransactionNotFoundError on closeTransaction if queryRunner is not found', async () => {
     const promise = sut.closeTransaction()
 
     expect(releaseSpy).not.toHaveBeenCalled()
-    await expect(promise).rejects.toThrow(new ConnectionNotFoundError())
+    await expect(promise).rejects.toThrow(new TransactionNotFoundError())
   })
 
-  it('shoud commit Transaction', async () => {
+  it('should commit transaction', async () => {
     await sut.connect()
+    await sut.openTransaction()
     await sut.commit()
 
-    expect(commitTransactionSpy).toHaveBeenCalled()
+    expect(commitTransactionSpy).toHaveBeenCalledWith()
     expect(commitTransactionSpy).toHaveBeenCalledTimes(1)
 
     await sut.disconnect()
   })
 
-  it('shoud return ConnectionNotFoundError on commit if connect is not found', async () => {
+  it('should return TransactionNotFoundError on commit if queryRunner is not found', async () => {
     const promise = sut.commit()
 
     expect(commitTransactionSpy).not.toHaveBeenCalled()
-    await expect(promise).rejects.toThrow(new ConnectionNotFoundError())
+    await expect(promise).rejects.toThrow(new TransactionNotFoundError())
   })
 
-  it('shoud rollback Transaction', async () => {
+  it('should rollback transaction', async () => {
     await sut.connect()
+    await sut.openTransaction()
     await sut.rollback()
 
-    expect(rollbackTransactionSpy).toHaveBeenCalled()
+    expect(rollbackTransactionSpy).toHaveBeenCalledWith()
     expect(rollbackTransactionSpy).toHaveBeenCalledTimes(1)
 
     await sut.disconnect()
   })
 
-  it('shoud return ConnectionNotFoundError on rollback if connect is not found', async () => {
+  it('should return TransactionNotFoundError on rollback if queryRunner is not found', async () => {
     const promise = sut.rollback()
 
     expect(rollbackTransactionSpy).not.toHaveBeenCalled()
-    await expect(promise).rejects.toThrow(new ConnectionNotFoundError())
+    await expect(promise).rejects.toThrow(new TransactionNotFoundError())
   })
 
-  it('shoud get repository', async () => {
+  it('should get repository from queryRunner', async () => {
     await sut.connect()
+    await sut.openTransaction()
     const repository = sut.getRepository(PgUser)
 
-    expect(getRepositorySpy).toHaveBeenCalled()
+    expect(getRepositorySpy).toHaveBeenCalledWith(PgUser)
     expect(getRepositorySpy).toHaveBeenCalledTimes(1)
     expect(repository).toBe('any_repo')
 
     await sut.disconnect()
   })
 
-  it('shoud return ConnectionNotFoundError on getRepository if connect is not found', async () => {
+  it('should get repository', async () => {
+    await sut.connect()
+    const repository = sut.getRepository(PgUser)
+
+    expect(getRepositorySpy).toHaveBeenCalledWith(PgUser)
+    expect(getRepositorySpy).toHaveBeenCalledTimes(1)
+    expect(repository).toBe('any_repo')
+
+    await sut.disconnect()
+  })
+
+  it('should return ConnectionNotFoundError on getRepository if connection is not found', async () => {
     expect(getRepositorySpy).not.toHaveBeenCalled()
     expect(() => sut.getRepository(PgUser)).toThrow(new ConnectionNotFoundError())
   })
