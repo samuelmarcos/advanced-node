@@ -1,12 +1,5 @@
-import { Controller } from '@/application/controllers'
+import { Controller, type DbTransaction } from '@/application/controllers'
 import { type HttpResponse } from '@/application/helpers'
-
-export interface DbTransaction {
-  openTransaction: () => Promise<void>
-  closeTransaction: () => Promise<void>
-  commit: () => Promise<void>
-  rollback: () => Promise<void>
-}
 
 export class DbTransactionController extends Controller {
   constructor (private readonly decoratee: Controller,

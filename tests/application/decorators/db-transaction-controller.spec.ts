@@ -1,5 +1,5 @@
-import { type DbTransaction, DbTransactionController } from '@/application/decorators'
-import { Controller } from '@/application/controllers'
+import { DbTransactionController } from '@/application/decorators'
+import { Controller, type DbTransaction } from '@/application/controllers'
 
 import { type MockProxy, mock } from 'jest-mock-extended'
 
