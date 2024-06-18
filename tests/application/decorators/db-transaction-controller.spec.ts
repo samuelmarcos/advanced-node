@@ -11,6 +11,8 @@ describe('DbTransactionController', () => {
   beforeAll(() => {
     decoratee = mock()
     db = mock()
+
+    decoratee.perform.mockResolvedValue({ statusCode: 204, data: null })
   })
 
   beforeEach(() => {
@@ -53,5 +55,11 @@ describe('DbTransactionController', () => {
     expect(db.rollback).toHaveBeenCalledTimes(1)
     expect(db.closeTransaction).toHaveBeenCalledWith()
     expect(db.closeTransaction).toHaveBeenCalledTimes(1)
+  })
+
+  it('should return same result as decoratee on success', async () => {
+    const htppResponse = await sut.perform({ any: 'any' })
+
+    expect(htppResponse).toEqual({ statusCode: 204, data: null })
   })
 })
