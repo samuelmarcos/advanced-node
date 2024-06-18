@@ -36,6 +36,21 @@ describe('DbTransactionController', () => {
 
     expect(db.commit).toHaveBeenCalledWith()
     expect(db.commit).toHaveBeenCalledTimes(1)
+    expect(db.rollback).not.toHaveBeenCalledWith()
+    expect(db.rollback).not.toHaveBeenCalledTimes(1)
+    expect(db.closeTransaction).toHaveBeenCalledWith()
+    expect(db.closeTransaction).toHaveBeenCalledTimes(1)
+  })
+
+  it('should call rollback and close transaction on fail', async () => {
+    const error = new Error('perform_error')
+    decoratee.perform.mockRejectedValueOnce(error)
+    await sut.perform({ any: 'any' })
+
+    expect(db.commit).not.toHaveBeenCalledWith()
+    expect(db.commit).not.toHaveBeenCalledTimes(1)
+    expect(db.rollback).toHaveBeenCalledWith()
+    expect(db.rollback).toHaveBeenCalledTimes(1)
     expect(db.closeTransaction).toHaveBeenCalledWith()
     expect(db.closeTransaction).toHaveBeenCalledTimes(1)
   })
