@@ -17,10 +17,11 @@ export class DbTransactionController {
       await this.db.openTransaction()
       const httpResponse = await this.decoratee.perform(httpRequest)
       await this.db.commit()
-      await this.db.closeTransaction()
       return httpResponse
-    } catch {
+    } catch (error) {
       await this.db.rollback()
+      throw error
+    } finally {
       await this.db.closeTransaction()
     }
   }
