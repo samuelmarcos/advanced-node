@@ -1,5 +1,5 @@
 import { type DbTransaction, DbTransactionController } from '@/application/decorators'
-import { type Controller } from '@/application/controllers'
+import { Controller } from '@/application/controllers'
 
 import { type MockProxy, mock } from 'jest-mock-extended'
 
@@ -17,6 +17,12 @@ describe('DbTransactionController', () => {
 
   beforeEach(() => {
     sut = new DbTransactionController(decoratee, db)
+  })
+
+  it('should extends Controller', async () => {
+    await sut.perform({ any: 'any' })
+
+    expect(sut).toBeInstanceOf(Controller)
   })
 
   it('should open transaction', async () => {

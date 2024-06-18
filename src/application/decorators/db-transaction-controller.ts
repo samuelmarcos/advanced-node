@@ -1,4 +1,4 @@
-import { type Controller } from '@/application/controllers'
+import { Controller } from '@/application/controllers'
 import { type HttpResponse } from '@/application/helpers'
 
 export interface DbTransaction {
@@ -8,11 +8,13 @@ export interface DbTransaction {
   rollback: () => Promise<void>
 }
 
-export class DbTransactionController {
+export class DbTransactionController extends Controller {
   constructor (private readonly decoratee: Controller,
-    private readonly db: DbTransaction) {}
+    private readonly db: DbTransaction) {
+    super()
+  }
 
-  public async perform (httpRequest: any): Promise<HttpResponse | undefined> {
+  public async perform (httpRequest: any): Promise<HttpResponse> {
     try {
       await this.db.openTransaction()
       const httpResponse = await this.decoratee.perform(httpRequest)
