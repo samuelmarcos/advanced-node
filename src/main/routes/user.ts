@@ -1,5 +1,5 @@
 import { adaptExpressRoute as adapt, adaptMulter as upload } from '@/main/adapters'
-import { makeSavePicureController } from '@/main/factories/controllers'
+import { makeSavePicureController } from '@/main/factories/application/controllers'
 import { type Router } from 'express'
 import { auth } from '../middlewares'
 
