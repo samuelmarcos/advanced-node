@@ -1,4 +1,5 @@
-import { Controller, type DbTransaction } from '@/application/controllers'
+import { Controller } from '@/application/controllers'
+import { type DbTransaction } from '@/application/contracts'
 import { type HttpResponse } from '@/application/helpers'
 
 export class DbTransactionController extends Controller {
